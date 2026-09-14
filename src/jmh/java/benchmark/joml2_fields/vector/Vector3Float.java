@@ -12,8 +12,9 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 
+import static fields.org.joml2.Joml.*;
+
 import fields.org.joml2.Float3;
-import fields.org.joml2.internal.types.Float3Impl;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -24,19 +25,19 @@ public class Vector3Float {
 	
 	@Setup(Level.Iteration)
 	public void setupMatrix() {
-		a = new Float3Impl().set(0.0f, 1.0f, 0.0f);
-		b = new Float3Impl().set(1.0f, 0.0f, 0.0f);
+		a = float3(0.0f, 1.0f, 0.0f);
+		b = float3(1.0f, 0.0f, 0.0f);
 	}
 	
 	@Benchmark
 	public Float3 testCreation(Blackhole hole) {
-		return new Float3Impl().set(1F, 0F, 0F);
+		return float3(1F, 0F, 0F);
 	}
 	
 	@Benchmark
 	public Float3 testExampleCase(Blackhole hole) {
-		Float3 v = new Float3Impl().set(a);
-		Float3 a = new Float3Impl().set(b);
+		Float3 v = float3(a);
+		Float3 a = float3(b);
 		v.add(a);
 		a.cross(v);
 		return a.normalize();
