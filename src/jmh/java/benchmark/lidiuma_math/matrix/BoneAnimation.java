@@ -1,13 +1,15 @@
 package benchmark.lidiuma_math.matrix;
 
-import lidiuma.org.lidiuma.math.matrix.Affine3F32;
-import lidiuma.org.lidiuma.math.rotation.QuaternionF32;
-import lidiuma.org.lidiuma.math.vector.Vec3F32;
+import static org.lidiuma.math.matrix.Matrices.*;
+import static org.lidiuma.math.rotation.Rotations.*;
+import static org.lidiuma.math.vector.Vectors.*;
+
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
-import static lidiuma.org.lidiuma.math.matrix.Matrices.*;
-import static lidiuma.org.lidiuma.math.rotation.Rotations.*;
-import static lidiuma.org.lidiuma.math.vector.Vectors.*;
+
+import org.lidiuma.math.matrix.Affine3F32;
+import org.lidiuma.math.rotation.QuaternionF32;
+import org.lidiuma.math.vector.Vec3F32;
 
 public class BoneAnimation {
 	int size;

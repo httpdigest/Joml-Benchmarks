@@ -17,7 +17,12 @@ Pull the repo. Make sure you have jdk25 installed (other jvm versions aren't tes
 and run the following command:    
 ```
 gradle jmh --no-daemon
-```
+```    
+
+The Markdown output will be automatically generated and put into the "results/output" folder.    
+On top of that the Raw Isolated results are copied into the "results/temp" folder.    
+If Jmh is run later on it will automatically append/replace the ran benchmarks in the temp folder.    
+So the entire thing doesn't have to be run.   
 
 ## How to setup the project
 

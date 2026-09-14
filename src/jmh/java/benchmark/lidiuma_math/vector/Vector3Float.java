@@ -1,10 +1,23 @@
 package benchmark.lidiuma_math.vector;
 
-import lidiuma.org.lidiuma.math.vector.Vec3F32;
-import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.infra.Blackhole;
+import static org.lidiuma.math.vector.Vectors.add;
+import static org.lidiuma.math.vector.Vectors.cross;
+import static org.lidiuma.math.vector.Vectors.dot;
+import static org.lidiuma.math.vector.Vectors.lengthSquared;
+import static org.lidiuma.math.vector.Vectors.normalize;
+
 import java.util.concurrent.TimeUnit;
-import static lidiuma.org.lidiuma.math.vector.Vectors.*;
+
+import org.lidiuma.math.vector.Vec3F32;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.infra.Blackhole;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)

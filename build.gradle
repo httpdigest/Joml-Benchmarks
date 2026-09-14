@@ -22,7 +22,6 @@ repositories {
 configurations {
 	jomlFields
     jomlRecords
-    lidiumaMath
 }
 
 task shadowJomlFields(type: ShadowJar) {
@@ -39,17 +38,11 @@ task shadowJomlRecords(type: ShadowJar) {
     relocate(new SimpleRelocator('org.joml', 'records.org.joml', null, null))
 }
 
-task shadowlidiumaMath(type: ShadowJar) {
-    group = 'shadow'
-    configurations = [project.configurations.lidiumaMath]
-    archiveClassifier = 'lidiuma-math'  // Unique classifier
-    relocate(new SimpleRelocator('org.lidiuma', 'lidiuma.org.lidiuma', null, null))
-}
-
 dependencies {
-	implementation 'com.google.code.gson:gson:2.14.0'
+	implementation "com.google.code.gson:gson:2.14.0"
 	implementation "org.joml:joml:${JOML_VERSION}"
-	implementation 'com.github.oshi:oshi-core:6.6.1'
+	implementation "com.github.oshi:oshi-core:6.6.1"
+	implementation "org.lidiuma:lidiuma-math:${LIDIUMA_MATH_VERSION}";
 	
 	jomlFields "org.joml:joml2-fields:${JOML2_VERSION}"
     implementation files(shadowJomlFields.archiveFile)
@@ -58,17 +51,15 @@ dependencies {
 	jomlRecords "org.joml:joml2-records:${JOML2_VERSION}"
     implementation files(shadowJomlRecords.archiveFile)
 	jmh files(shadowJomlRecords.archiveFile)
-
-    lidiumaMath "org.lidiuma:lidiuma-math:${LIDIUMA_MATH_VERSION}"
-    implementation files(shadowlidiumaMath.archiveFile)
-    jmh files(shadowlidiumaMath.archiveFile)
 }
 
 jmh {
 	includes = [
-//		'benchmark\\.*'
-//		'benchmark\\.joml\\.*'
+//		'benchmark.*'
+//		'benchmark.joml.*'
+//		'benchmark.joml2_fields.*'
 //		'benchmark.joml2_records.*'
+//		'benchmark.lidiuma_math.*'
 	]
 	humanOutputFile = null
     resultFormat = 'json'
@@ -87,18 +78,18 @@ tasks.named('jmh') {
 }
 
 tasks.withType(JavaCompile).configureEach { task ->
-    task.dependsOn shadowJomlFields, shadowJomlRecords, shadowlidiumaMath
+    task.dependsOn shadowJomlFields, shadowJomlRecords
 }
 
 tasks.matching { it.name.startsWith("jmh") }.configureEach { task ->
-    task.dependsOn shadowJomlFields, shadowJomlRecords, shadowlidiumaMath
+    task.dependsOn shadowJomlFields, shadowJomlRecords
 }
 
 task setup {
     group = 'internal'
     description = 'Sets the Project full up and generates the dependencies as needed'
     
-    dependsOn shadowJomlFields, shadowJomlRecords, shadowlidiumaMath
+    dependsOn shadowJomlFields, shadowJomlRecords
 }
 
 task generateMarkdownResults(type: JavaExec) {

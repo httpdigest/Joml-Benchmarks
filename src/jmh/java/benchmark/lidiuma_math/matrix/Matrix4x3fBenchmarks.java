@@ -1,14 +1,24 @@
 package benchmark.lidiuma_math.matrix;
 
-import lidiuma.org.lidiuma.math.matrix.Affine3F32;
-import lidiuma.org.lidiuma.math.rotation.AngleF32;
-import lidiuma.org.lidiuma.math.vector.Vec3F32;
-import org.openjdk.jmh.annotations.*;
+import static org.lidiuma.math.matrix.Matrices.*;
+import static org.lidiuma.math.rotation.Rotations.*;
+import static org.lidiuma.math.vector.Vectors.*;
+
 import java.util.concurrent.TimeUnit;
 import java.util.random.RandomGeneratorFactory;
-import static lidiuma.org.lidiuma.math.matrix.Matrices.*;
-import static lidiuma.org.lidiuma.math.rotation.Rotations.*;
-import static lidiuma.org.lidiuma.math.vector.Vectors.*;
+
+import org.lidiuma.math.matrix.Affine3F32;
+import org.lidiuma.math.rotation.AngleF32;
+import org.lidiuma.math.vector.Vec3F32;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
