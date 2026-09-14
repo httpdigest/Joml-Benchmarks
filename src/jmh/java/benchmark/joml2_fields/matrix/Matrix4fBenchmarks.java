@@ -12,10 +12,10 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 
+import static fields.org.joml2.Joml.*;
+
 import fields.org.joml2.Float3;
 import fields.org.joml2.Float4x4;
-import fields.org.joml2.internal.types.Float3Impl;
-import fields.org.joml2.internal.types.Float4x4Impl;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -26,17 +26,20 @@ public class Matrix4fBenchmarks {
 	
 	@Setup(Level.Iteration)
 	public void setupMatrix() {
-		matrix = new Float4x4Impl().translate(32F, 0.5F, 1F).scale(0.25F, 2F, 1F).rotateAxis(ROTATION, 0, 1F, 0);
+		matrix = float4x4()
+				.translate(32F, 0.5F, 1F)
+				.scale(0.25F, 2F, 1F)
+				.rotateAxis(ROTATION, 0, 1F, 0);
 	}
 	
 	@Benchmark
 	public Float4x4 testCreation() {
-		return new Float4x4Impl();
+		return float4x4();
 	}
 	
 	@Benchmark
 	public Float4x4 testStandardOperation(Blackhole hole) {
-		return new Float4x4Impl()
+		return float4x4()
 				.translate(32F, 0.5F, 1F)
 				.scale(0.25F, 2F, 1F)
 				.rotateAxis(ROTATION, 0, 1F, 0);
@@ -44,7 +47,7 @@ public class Matrix4fBenchmarks {
 	
 	@Benchmark
 	public Float3 testMatrixTransform(Blackhole hole) {
-		return matrix.transformPosition(new Float3Impl().set(1, 3, 6));
+		return matrix.transformPosition(float3(1, 3, 6));
 	}
 	
 }
