@@ -1,7 +1,6 @@
 package benchmark.joml.matrix;
 
 import java.util.random.RandomGenerator;
-import java.util.random.RandomGeneratorFactory;
 
 import org.joml.Matrix4x3f;
 import org.joml.Quaternionf;
@@ -17,7 +16,8 @@ public class BoneAnimation {
 	Quaternionf[] rotationEnd;
 	Vector3f[] scaleEnd;
 	Matrix4x3f[] inverseMatrices;
-	RandomGenerator generator;
+	/** Interpolation factors, drawn up front so the RNG stays out of the measured region. */
+	float[] factors;
 	
 	public BoneAnimation(int count, RandomGenerator generator) {
 		this.size = count;
@@ -30,6 +30,7 @@ public class BoneAnimation {
 		scaleEnd = new Vector3f[count];
 		
 		inverseMatrices = new Matrix4x3f[count];
+		factors = new float[count];
 		
 		for(int i = 0;i<count;i++) {
 			translationStart[i] = new Vector3f((float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian());
@@ -42,7 +43,9 @@ public class BoneAnimation {
 			
 			inverseMatrices[i] = new Matrix4x3f().translationRotateScale(translationStart[i], rotationStart[i], scaleStart[i]).invert();
 		}
-		this.generator = RandomGeneratorFactory.getDefault().create(generator.nextLong());
+		for(int i = 0;i<count;i++) {
+			factors[i] = generator.nextFloat();
+		}
 	}
 	
 	public Matrix4x3f[] process() {
@@ -51,7 +54,7 @@ public class BoneAnimation {
 		Quaternionf rotation = new Quaternionf();
 		Vector3f scale = new Vector3f();
 		for(int i = 0;i<size;i++) {
-			float t = generator.nextFloat();
+			float t = factors[i];
 			Matrix4x3f result = new Matrix4x3f();
 			
 			translationStart[i].lerp(translationEnd[i], t, translation);

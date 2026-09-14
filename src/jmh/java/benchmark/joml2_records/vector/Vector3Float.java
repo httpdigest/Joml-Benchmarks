@@ -10,7 +10,6 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.infra.Blackhole;
 
 import records.org.joml2.Float3;
 
@@ -18,28 +17,33 @@ import records.org.joml2.Float3;
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class Vector3Float {
+	float ax, ay, az;
+	float bx, by, bz;
 	Float3 a;
 	Float3 b;	
 	
 	@Setup(Level.Iteration)
-	public void setupMatrix() {
-		a = new Float3(0.0f, 1.0f, 0.0f);
-		b = new Float3(1.0f, 0.0f, 0.0f);
+	public void setupVectors() {
+		// Same two unit vectors (~62 degrees apart) as every other library's row.
+		ax = 0.309426374F; ay = 0.928279122F; az = 0.206284249F;
+		bx = 0.843274043F; by = 0.105409255F; bz = 0.527046277F;
+		a = new Float3(ax, ay, az);
+		b = new Float3(bx, by, bz);
 	}
 	
 	@Benchmark
-	public Float3 testCreation(Blackhole hole) {
-		return new Float3(1F, 0F, 0F);
+	public Float3 testCreation() {
+		return new Float3(ax, ay, az);
 	}
-	
+
 	@Benchmark
-	public Float3 testExampleCase(Blackhole hole) {
+	public Float3 testExampleCase() {
 		Float3 c = a.add(b);
-		return c.cross(a).normalize();
+		return b.cross(c).normalize();
 	}
-	
+
 	@Benchmark
-	public float testAngle(Blackhole hole) {
+	public float testAngle() {
 		return a.angleBetween(b);
 	}
 }

@@ -5,7 +5,6 @@ import static org.lidiuma.math.rotation.Rotations.*;
 import static org.lidiuma.math.vector.Vectors.*;
 
 import java.util.random.RandomGenerator;
-import java.util.random.RandomGeneratorFactory;
 
 import org.lidiuma.math.matrix.Affine3F32;
 import org.lidiuma.math.rotation.QuaternionF32;
@@ -21,7 +20,8 @@ public class BoneAnimation {
 	QuaternionF32[] rotationEnd;
 	Vec3F32[] scaleEnd;
 	Affine3F32[] inverseMatrices;
-	RandomGenerator generator;
+	/** Interpolation factors, drawn up front so the RNG stays out of the measured region. */
+	float[] factors;
 	
 	public BoneAnimation(int count, RandomGenerator generator) {
 		this.size = count;
@@ -34,6 +34,7 @@ public class BoneAnimation {
 		scaleEnd = new Vec3F32[count];
 		
 		inverseMatrices = new Affine3F32[count];
+		factors = new float[count];
 		
 		for(int i = 0;i<count;i++) {
 			translationStart[i] = new Vec3F32((float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian());
@@ -46,13 +47,15 @@ public class BoneAnimation {
 			
 			inverseMatrices[i] = inverse(fromTRS(translationStart[i], rotationStart[i], scaleStart[i]));
 		}
-		this.generator = RandomGeneratorFactory.getDefault().create(generator.nextLong());
+		for(int i = 0;i<count;i++) {
+			factors[i] = generator.nextFloat();
+		}
 	}
 	
 	public Affine3F32[] process() {
 		Affine3F32[] results = new Affine3F32[size];
 		for(int i = 0;i<size;i++) {
-			float t = generator.nextFloat();
+			float t = factors[i];
 			Vec3F32 translation = lerp(translationStart[i], translationEnd[i], t);
 			QuaternionF32 rotation = nlerp(rotationStart[i], rotationEnd[i], t);
 			Vec3F32 scale = lerp(scaleStart[i], scaleEnd[i], t);

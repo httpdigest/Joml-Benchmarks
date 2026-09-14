@@ -11,6 +11,16 @@ plugins {
 
 compileJava.options.encoding = "UTF-8"
 
+// Pin the compiler, so the build does not quietly follow whatever JDK happens to be
+// on PATH. Note this does NOT cover the Gradle launcher itself: Gradle's Groovy build
+// script compiler rejects class file major version 72, so the daemon JVM must also be
+// 27 or older (set org.gradle.java.home, or run with JAVA_HOME pointing at a JDK 25).
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -69,7 +79,14 @@ jmh {
     timeOnIteration = '2s'
     warmup = '3s'
     fork = 1
-    operationsPerInvocation = 5
+    // Allocation per operation, reported next to the timings. Escape analysis
+    // scalar-replaces the intermediates in several of these benchmarks, so the
+    // B/op column is the only place the mutable-vs-immutable allocation
+    // difference is actually visible.
+    profilers = ['gc']
+    // NOTE: do not set operationsPerInvocation here. Every @Benchmark below
+    // performs exactly one operation per invocation; setting it to 5 silently
+    // divided every published score by 5.
     threads = 1
 }
 

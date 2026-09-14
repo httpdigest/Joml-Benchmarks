@@ -37,7 +37,10 @@ public class TableGenerator {
 				builder.append("|").append(setting.buildEmpty());
 				if(setting.minRight() > 0) {
 					String[] split = element.split(setting.minimumIndicator, 2);
-					if(split.length != 2) throw new IllegalStateException("Element ["+element+"] is missing a Spliting Indicator");
+					// A cell without the indicator is a single-line cell, e.g. the "N/A" written
+					// for a library that does not implement a given benchmark. Treat the second
+					// line as empty instead of failing the whole report.
+					if(split.length != 2) split = new String[] {element, ""};
 					int length = split[0].length()+2+Math.max(split[1].length(), setting.minRight());
 					int start = builder.length() - setting.getAlignOffset(length);
 					builder.replace(start, start+element.length(), element);
@@ -79,7 +82,7 @@ public class TableGenerator {
 				int length = s.length();
 				if(setting.minRight() > 0) {
 					String[] split = s.split(setting.minimumIndicator, 2);
-					if(split.length != 2) throw new IllegalStateException("Element ["+s+"] is missing a Spliting Indicator");
+					if(split.length != 2) split = new String[] {s, ""};
 					length = split[0].length()+1+Math.max(split[1].length(), setting.minRight());
 				}
 				settings.set(startIndex+j, setting.calculateWidth(setting.left()+setting.right()+Math.max(list.get(i).get(j).length(), length)));
