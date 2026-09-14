@@ -304,6 +304,24 @@ public class BenchmarkFormatter {
 		return obj.has(key) && !obj.get(key).isJsonNull() ? obj.get(key).getAsInt() : fallback;
 	}
 	
+	/**
+	 * The joml.* switches the run was configured with. These change what the libraries
+	 * actually execute (fastmath, sinLookup, FMA), so two runs that disagree on them do
+	 * not belong in the same table. Everything else JMH records in jvmArgs is harness
+	 * noise like file.encoding and tmpdir, which would only produce false mismatches.
+	 */
+	private static String libraryOptions(JsonObject obj) {
+		if(!obj.has("jvmArgs") || !obj.get("jvmArgs").isJsonArray()) return "unrecorded";
+		List<String> options = new ArrayList<>();
+		for(JsonElement element : obj.getAsJsonArray("jvmArgs")) {
+			String arg = element.getAsString();
+			if(arg.startsWith("-Djoml.")) options.add(arg.substring(2));
+		}
+		if(options.isEmpty()) return "defaults";
+		Collections.sort(options);
+		return String.join(" ", options);
+	}
+	
 	private static String jsonEnvironment(JsonObject obj, String key) {
 		return obj.has("_env") ? jsonString(obj.getAsJsonObject("_env"), key, "unrecorded") : "unrecorded";
 	}
@@ -392,13 +410,13 @@ public class BenchmarkFormatter {
 	 * equality drives findInconsistencies, so adding a field here automatically makes
 	 * a mismatch in it show up as "Consistent Data: No" rather than passing silently.
 	 */
-	public record Metadata(String version, String jdk, String vm, String vmVersion, int threads, int forks, int warmup, String warupTime, int iterations, String iterationTime, String os, String cpu) {
+	public record Metadata(String version, String jdk, String vm, String vmVersion, int threads, int forks, int warmup, String warupTime, int iterations, String iterationTime, String os, String cpu, String libraryOptions) {
 		public Metadata(JsonObject obj) {
 			this(jsonString(obj, "jmhVersion", "unrecorded"), jsonString(obj, "jdkVersion", "unrecorded"), jsonString(obj, "vmName", "unrecorded"), jsonString(obj, "vmVersion", "unrecorded"),
 					jsonInt(obj, "threads", 1), jsonInt(obj, "forks", 1),
 					jsonInt(obj, "warmupIterations", 0), jsonString(obj, "warmupTime", "unrecorded"),
 					jsonInt(obj, "measurementIterations", 0), jsonString(obj, "measurementTime", "unrecorded"),
-					jsonEnvironment(obj, "os"), jsonEnvironment(obj, "cpu"));
+					jsonEnvironment(obj, "os"), jsonEnvironment(obj, "cpu"), BenchmarkFormatter.libraryOptions(obj));
 		}
 		
 		public String toPrettyText() {
@@ -406,6 +424,7 @@ public class BenchmarkFormatter {
 			joiner.add("OS="+os()+"\n");
 			joiner.add("CPU="+cpu()+"\n");
 			joiner.add("JDK="+jdk()+" ("+vm()+" "+vmVersion()+")\n");
+			joiner.add("Library options="+libraryOptions()+"\n");
 			joiner.add("jmh="+version()+"\n");
 			joiner.add("Threads="+threads()+"\n");
 			joiner.add("Forks="+forks()+"\n");
@@ -417,7 +436,7 @@ public class BenchmarkFormatter {
 		}
 		
 		public String toText() {
-			return "[os="+os()+", cpu="+cpu()+", jdk="+jdk()+", vm="+vmVersion()+", jmh="+version()+", threads="+threads()+", forks="+forks()+", warmCount="+warmup()+", warmTime="+warupTime()+", count="+iterations()+", time="+iterationTime()+"]";
+			return "[os="+os()+", cpu="+cpu()+", jdk="+jdk()+", vm="+vmVersion()+", opts="+libraryOptions()+", jmh="+version()+", threads="+threads()+", forks="+forks()+", warmCount="+warmup()+", warmTime="+warupTime()+", count="+iterations()+", time="+iterationTime()+"]";
 		}
 	}
 }
