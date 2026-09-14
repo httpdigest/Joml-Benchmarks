@@ -15,24 +15,17 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
+import benchmark.base.matrix.Matrix4x3fData;
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-public class Matrix4x3fBenchmarks {
-	private float tx, ty, tz;
-	private float angle, ax, ay, az;
-	private float qx, qy, qz, qw;
-	private float sx, sy, sz;
-	private float px, py, pz;
+public class Matrix4x3fBenchmarks extends Matrix4x3fData {
 	private Matrix4x3f matrix;
 	
 	@Setup(Level.Iteration)
 	public void setupMatrix() {
-		tx = 32F; ty = 0.5F; tz = 1F;
-		angle = 0.558505361F; ax = 0F; ay = 1F; az = 0F;
-		qx = 0F; qy = 0.275637356F; qz = 0F; qw = 0.961261696F;
-		sx = 0.25F; sy = 2F; sz = 1F;
-		px = 1F; py = 3F; pz = 6F;
+		setupMatrixData();
 		matrix = new Matrix4x3f().translationRotateScale(tx, ty, tz, qx, qy, qz, qw, sx, sy, sz);
 	}
 	

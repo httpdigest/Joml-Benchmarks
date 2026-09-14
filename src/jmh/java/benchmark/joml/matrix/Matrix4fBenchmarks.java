@@ -13,26 +13,17 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
+import benchmark.base.matrix.Matrix4fData;
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-public class Matrix4fBenchmarks {
-	private float tx, ty, tz;
-	private float angle, ax, ay, az;
-	private float qx, qy, qz, qw;
-	private float sx, sy, sz;
-	private float px, py, pz;
+public class Matrix4fBenchmarks extends Matrix4fData {
 	private Matrix4f matrix;
 	
 	@Setup(Level.Iteration)
 	public void setupMatrix() {
-		tx = 32F; ty = 0.5F; tz = 1F;
-		// 32 degrees about +Y, as an axis/angle and as the equivalent unit quaternion,
-		// so testStandardOperation and testComposeTRS build the very same matrix.
-		angle = 0.558505361F; ax = 0F; ay = 1F; az = 0F;
-		qx = 0F; qy = 0.275637356F; qz = 0F; qw = 0.961261696F;
-		sx = 0.25F; sy = 2F; sz = 1F;
-		px = 1F; py = 3F; pz = 6F;
+		setupMatrixData();
 		matrix = new Matrix4f().translationRotateScale(tx, ty, tz, qx, qy, qz, qw, sx, sy, sz);
 	}
 	

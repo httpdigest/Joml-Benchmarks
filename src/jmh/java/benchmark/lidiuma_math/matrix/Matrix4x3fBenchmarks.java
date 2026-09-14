@@ -1,7 +1,9 @@
 package benchmark.lidiuma_math.matrix;
 
-import static org.lidiuma.math.matrix.Matrices.*;
-import static org.lidiuma.math.vector.Vectors.*;
+import static org.lidiuma.math.matrix.Matrices.fromTRS;
+import static org.lidiuma.math.matrix.Matrices.identityAffine3F32;
+import static org.lidiuma.math.matrix.Matrices.multiply;
+import static org.lidiuma.math.vector.Vectors.vec3;
 
 import java.util.concurrent.TimeUnit;
 import java.util.random.RandomGeneratorFactory;
@@ -19,23 +21,17 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
+import benchmark.base.matrix.Matrix4x3fData;
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-public class Matrix4x3fBenchmarks {
-	private float tx, ty, tz;
-	private float qx, qy, qz, qw;
-	private float sx, sy, sz;
-	private float px, py, pz;
+public class Matrix4x3fBenchmarks extends Matrix4x3fData {
 	private Affine3F32 matrix;
 
 	@Setup(Level.Iteration)
 	public void setupMatrix() {
-		tx = 32F; ty = 0.5F; tz = 1F;
-		// 32 degrees about +Y as a unit quaternion.
-		qx = 0F; qy = 0.275637356F; qz = 0F; qw = 0.961261696F;
-		sx = 0.25F; sy = 2F; sz = 1F;
-		px = 1F; py = 3F; pz = 6F;
+		setupMatrixData();
 		matrix = fromTRS(vec3(tx, ty, tz), new QuaternionF32(qx, qy, qz, qw), vec3(sx, sy, sz));
 	}
 

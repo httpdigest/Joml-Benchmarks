@@ -12,33 +12,31 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
+import benchmark.base.vector.Vector3fData;
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-public class Vector3Float {
-	float ax, ay, az;
-	float bx, by, bz;
-	Vector3f a;
-	Vector3f b;
+public class Vector3fBenchmarks extends Vector3fData {
+	Vector3f s;
+	Vector3f e;
 	
 	@Setup(Level.Iteration)
 	public void setupVectors() {
-		// Two arbitrary unit vectors about 62 degrees apart.
-		ax = 0.309426374F; ay = 0.928279122F; az = 0.206284249F;
-		bx = 0.843274043F; by = 0.105409255F; bz = 0.527046277F;
-		a = new Vector3f(ax, ay, az);
-		b = new Vector3f(bx, by, bz);
+		setupVectorData();
+		s = new Vector3f(sx, sy, sz);
+		e = new Vector3f(ex, ey, ez);
 	}
 	
 	@Benchmark
 	public Vector3f testCreation() {
-		return new Vector3f(ax, ay, az);
+		return new Vector3f(sx, sy, sz);
 	}
 
 	@Benchmark
 	public Vector3f testExampleCase() {
-		Vector3f v = new Vector3f(a);
-		Vector3f w = new Vector3f(b);
+		Vector3f v = new Vector3f(s);
+		Vector3f w = new Vector3f(e);
 		v.add(w);
 		w.cross(v);
 		return w.normalize();
@@ -46,6 +44,6 @@ public class Vector3Float {
 	
 	@Benchmark
 	public float testAngle() {
-		return a.angle(b);
+		return s.angle(e);
 	}
 }

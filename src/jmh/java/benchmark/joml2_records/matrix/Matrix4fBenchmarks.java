@@ -11,28 +11,19 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
+import benchmark.base.matrix.Matrix4fData;
 import records.org.joml2.Float3;
 import records.org.joml2.Float4x4;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-public class Matrix4fBenchmarks {
-	private float tx, ty, tz;
-	private float angle, ax, ay, az;
-	private float qx, qy, qz, qw;
-	private float sx, sy, sz;
-	private float px, py, pz;
+public class Matrix4fBenchmarks extends Matrix4fData {
 	private Float4x4 matrix;
 	
 	@Setup(Level.Iteration)
 	public void setupMatrix() {
-		tx = 32F; ty = 0.5F; tz = 1F;
-		angle = 0.558505361F; ax = 0F; ay = 1F; az = 0F;
-		// composeTRS takes (tx,ty,tz, qx,qy,qz,qw, sx,sy,sz).
-		qx = 0F; qy = 0.275637356F; qz = 0F; qw = 0.961261696F;
-		sx = 0.25F; sy = 2F; sz = 1F;
-		px = 1F; py = 3F; pz = 6F;
+		setupMatrixData();
 		matrix = Float4x4.composeTRS(tx, ty, tz, qx, qy, qz, qw, sx, sy, sz);
 	}
 	

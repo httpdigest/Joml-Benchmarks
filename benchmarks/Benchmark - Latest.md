@@ -4,10 +4,10 @@
 
 - Publish Date: 2026-09-14
 - Consistent Data: Yes
-	- OS=Apple macOS 26.6.2 build 25G83
-	- CPU=Apple M4 Max
-	- JDK=25.0.2 (OpenJDK 64-Bit Server VM 25.0.2+10-69)
-	- Library options=joml.fastmath=true joml.sinLookup=true joml.useFma=true joml.useMathFma=true
+	- OS=Microsoft Windows 10 build 19045
+	- CPU=AMD Ryzen 9 7900 12-Core Processor
+	- JDK=25.0.3 (OpenJDK 64-Bit Server VM 25.0.3+9-LTS)
+	- Library options=[joml.fastmath=true, joml.sinLookup=true, joml.useFma=true, joml.useMathFma=true]
 	- jmh=1.36
 	- Threads=1
 	- Forks=1
@@ -28,57 +28,57 @@
 
 ### Matrix4fBenchmarks
 
-|      Function       |      Joml<br>Score       | Joml2<br>Fields<br>Score | Joml2<br>Records<br>Score |
-|---------------------|--------------------------|--------------------------|---------------------------|
-|         ComposeTRS  |    6.228 ns/op<br>0.049 ±|    5.839 ns/op<br>0.021 ±|     4.939 ns/op<br>0.033 ±|
-|           Creation  |    3.133 ns/op<br>0.005 ±|    2.954 ns/op<br>0.047 ±|     2.956 ns/op<br>0.048 ±|
-|    MatrixTransform  |    3.126 ns/op<br>0.041 ±|    3.272 ns/op<br>0.027 ±|     3.012 ns/op<br>0.027 ±|
-|  StandardOperation  |     8.63 ns/op<br>0.316 ±|     6.25 ns/op<br>0.026 ±|      6.059 ns/op<br>0.03 ±|
+|      Function       |         Joml<br>Score          |    Joml2<br>Fields<br>Score    |   Joml2<br>Records<br>Score    |
+|---------------------|--------------------------------|--------------------------------|--------------------------------|
+|         ComposeTRS  |    3.876 ns/op<br>Error 0.186 ±|    4.484 ns/op<br>Error 0.238 ±|    3.783 ns/op<br>Error 0.063 ±|
+|           Creation  |     2.92 ns/op<br>Error 0.052 ±|    3.087 ns/op<br>Error 0.342 ±|    2.922 ns/op<br>Error 0.126 ±|
+|    MatrixTransform  |    2.539 ns/op<br>Error 0.129 ±|    2.629 ns/op<br>Error 0.094 ±|     2.25 ns/op<br>Error 0.145 ±|
+|  StandardOperation  |    7.111 ns/op<br>Error 0.336 ±|    5.968 ns/op<br>Error 0.439 ±|    4.863 ns/op<br>Error 0.076 ±|
 
 Allocation per operation:
 
-|      Function       | Joml<br>Alloc | Joml2<br>Fields<br>Alloc | Joml2<br>Records<br>Alloc |
-|---------------------|---------------|--------------------------|---------------------------|
-|         ComposeTRS  |    80.0 B/op  |               80.0 B/op  |                80.0 B/op  |
-|           Creation  |    80.0 B/op  |               80.0 B/op  |                80.0 B/op  |
-|    MatrixTransform  |    24.0 B/op  |               24.0 B/op  |                24.0 B/op  |
-|  StandardOperation  |    80.0 B/op  |               80.0 B/op  |                80.0 B/op  |
+|      Function       |       Joml<br>Alloc        |  Joml2<br>Fields<br>Alloc  | Joml2<br>Records<br>Alloc  |
+|---------------------|----------------------------|----------------------------|----------------------------|
+|         ComposeTRS  |  80.0 B/op<br>Error 0.0 ±  |  80.0 B/op<br>Error 0.0 ±  |  80.0 B/op<br>Error 0.0 ±  |
+|           Creation  |  80.0 B/op<br>Error 0.0 ±  |  80.0 B/op<br>Error 0.0 ±  |  80.0 B/op<br>Error 0.0 ±  |
+|    MatrixTransform  |  24.0 B/op<br>Error 0.0 ±  |  24.0 B/op<br>Error 0.0 ±  |  24.0 B/op<br>Error 0.0 ±  |
+|  StandardOperation  |  80.0 B/op<br>Error 0.0 ±  |  80.0 B/op<br>Error 0.0 ±  |  80.0 B/op<br>Error 0.0 ±  |
 
 ### Matrix4x3fBenchmarks
 
-|      Function       |       Joml<br>Score       | Joml2<br>Fields<br>Score  | Joml2<br>Records<br>Score |  Lidiuma<br>Math<br>Score  |
-|---------------------|---------------------------|---------------------------|---------------------------|----------------------------|
-|      BoneAnimation  |    21.511 ns/op<br>0.159 ±|    15.705 ns/op<br>0.094 ±|    10.935 ns/op<br>0.164 ±|    185.496 ns/op<br>1.662 ±|
-|         ComposeTRS  |     5.244 ns/op<br>0.041 ±|     5.584 ns/op<br>0.024 ±|     4.797 ns/op<br>0.051 ±|     115.24 ns/op<br>0.879 ±|
-|           Creation  |     2.807 ns/op<br>0.047 ±|      2.663 ns/op<br>0.05 ±|     2.655 ns/op<br>0.017 ±|      5.826 ns/op<br>0.102 ±|
-|    MatrixTransform  |       3.1 ns/op<br>0.072 ±|     3.296 ns/op<br>0.015 ±|     3.009 ns/op<br>0.021 ±|       6.547 ns/op<br>0.16 ±|
-|  StandardOperation  |     6.119 ns/op<br>0.049 ±|     6.011 ns/op<br>0.048 ±|     5.878 ns/op<br>0.038 ±|                  N/A       |
+|      Function       |          Joml<br>Score          |    Joml2<br>Fields<br>Score    |   Joml2<br>Records<br>Score    |     Lidiuma<br>Math<br>Score     |
+|---------------------|---------------------------------|--------------------------------|--------------------------------|----------------------------------|
+|      BoneAnimation  |    20.231 ns/op<br>Error 0.523 ±|    18.092 ns/op<br>Error 2.18 ±|    15.72 ns/op<br>Error 0.291 ±|    169.323 ns/op<br>Error 20.92 ±|
+|         ComposeTRS  |     3.421 ns/op<br>Error 0.206 ±|    4.367 ns/op<br>Error 0.198 ±|    4.433 ns/op<br>Error 0.169 ±|    110.082 ns/op<br>Error 7.942 ±|
+|           Creation  |     2.421 ns/op<br>Error 0.163 ±|    2.592 ns/op<br>Error 0.079 ±|    2.574 ns/op<br>Error 0.057 ±|      8.014 ns/op<br>Error 1.053 ±|
+|    MatrixTransform  |     2.551 ns/op<br>Error 0.277 ±|    2.693 ns/op<br>Error 0.152 ±|    2.324 ns/op<br>Error 0.018 ±|       6.51 ns/op<br>Error 0.462 ±|
+|  StandardOperation  |     5.778 ns/op<br>Error 0.494 ±|     5.562 ns/op<br>Error 1.54 ±|    5.096 ns/op<br>Error 0.174 ±|                        N/A       |
 
 Allocation per operation:
 
-|      Function       | Joml<br>Alloc | Joml2<br>Fields<br>Alloc | Joml2<br>Records<br>Alloc | Lidiuma<br>Math<br>Alloc |
-|---------------------|---------------|--------------------------|---------------------------|--------------------------|
-|      BoneAnimation  |   68.16 B/op  |              68.16 B/op  |               68.16 B/op  |           1,469.79 B/op  |
-|         ComposeTRS  |    64.0 B/op  |               64.0 B/op  |                64.0 B/op  |            1,040.0 B/op  |
-|           Creation  |    64.0 B/op  |               64.0 B/op  |                64.0 B/op  |               96.0 B/op  |
-|    MatrixTransform  |    24.0 B/op  |               24.0 B/op  |                24.0 B/op  |               72.0 B/op  |
-|  StandardOperation  |    64.0 B/op  |               64.0 B/op  |                64.0 B/op  |                     N/A  |
+|      Function       |        Joml<br>Alloc        |  Joml2<br>Fields<br>Alloc   |  Joml2<br>Records<br>Alloc  |     Lidiuma<br>Math<br>Alloc      |
+|---------------------|-----------------------------|-----------------------------|-----------------------------|-----------------------------------|
+|      BoneAnimation  |  68.16 B/op<br>Error 0.0 ±  |  68.16 B/op<br>Error 0.0 ±  |  68.16 B/op<br>Error 0.0 ±  |  1,469.787 B/op<br>Error 0.006 ±  |
+|         ComposeTRS  |   64.0 B/op<br>Error 0.0 ±  |   64.0 B/op<br>Error 0.0 ±  |   64.0 B/op<br>Error 0.0 ±  |      1,184.0 B/op<br>Error 0.0 ±  |
+|           Creation  |   64.0 B/op<br>Error 0.0 ±  |   64.0 B/op<br>Error 0.0 ±  |   64.0 B/op<br>Error 0.0 ±  |         96.0 B/op<br>Error 0.0 ±  |
+|    MatrixTransform  |   24.0 B/op<br>Error 0.0 ±  |   24.0 B/op<br>Error 0.0 ±  |   24.0 B/op<br>Error 0.0 ±  |         72.0 B/op<br>Error 0.0 ±  |
+|  StandardOperation  |   64.0 B/op<br>Error 0.0 ±  |   64.0 B/op<br>Error 0.0 ±  |   64.0 B/op<br>Error 0.0 ±  |                              N/A  |
 
 ## Vector
 
-### Vector3Float
+### Vector3fBenchmarks
 
-|   Function    |      Joml<br>Score       | Joml2<br>Fields<br>Score | Joml2<br>Records<br>Score | Lidiuma<br>Math<br>Score |
-|---------------|--------------------------|--------------------------|---------------------------|--------------------------|
-|        Angle  |     4.88 ns/op<br>0.063 ±|    3.289 ns/op<br>0.117 ±|     3.103 ns/op<br>0.031 ±|    5.809 ns/op<br>0.083 ±|
-|     Creation  |    2.026 ns/op<br>0.013 ±|     2.026 ns/op<br>0.03 ±|     2.034 ns/op<br>0.014 ±|    6.777 ns/op<br>0.043 ±|
-|  ExampleCase  |    2.441 ns/op<br>0.015 ±|    3.118 ns/op<br>0.096 ±|      2.46 ns/op<br>0.033 ±|    6.626 ns/op<br>0.063 ±|
+|   Function    |         Joml<br>Score          |    Joml2<br>Fields<br>Score    |   Joml2<br>Records<br>Score    |    Lidiuma<br>Math<br>Score    |
+|---------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
+|        Angle  |    6.839 ns/op<br>Error 1.179 ±|    4.249 ns/op<br>Error 0.289 ±|    4.114 ns/op<br>Error 0.035 ±|    7.856 ns/op<br>Error 0.523 ±|
+|     Creation  |    1.542 ns/op<br>Error 0.056 ±|    1.636 ns/op<br>Error 0.274 ±|    1.523 ns/op<br>Error 0.018 ±|    4.427 ns/op<br>Error 0.225 ±|
+|  ExampleCase  |    2.832 ns/op<br>Error 0.073 ±|    3.097 ns/op<br>Error 0.181 ±|    2.671 ns/op<br>Error 0.061 ±|     5.195 ns/op<br>Error 1.23 ±|
 
 Allocation per operation:
 
-|   Function    | Joml<br>Alloc | Joml2<br>Fields<br>Alloc | Joml2<br>Records<br>Alloc | Lidiuma<br>Math<br>Alloc |
-|---------------|---------------|--------------------------|---------------------------|--------------------------|
-|        Angle  |     0.0 B/op  |                0.0 B/op  |                 0.0 B/op  |                0.0 B/op  |
-|     Creation  |    24.0 B/op  |               24.0 B/op  |                24.0 B/op  |               72.0 B/op  |
-|  ExampleCase  |    24.0 B/op  |               24.0 B/op  |                24.0 B/op  |               72.0 B/op  |
+|   Function    |       Joml<br>Alloc        |  Joml2<br>Fields<br>Alloc  | Joml2<br>Records<br>Alloc  |  Lidiuma<br>Math<br>Alloc  |
+|---------------|----------------------------|----------------------------|----------------------------|----------------------------|
+|        Angle  |   0.0 B/op<br>Error 0.0 ±  |   0.0 B/op<br>Error 0.0 ±  |   0.0 B/op<br>Error 0.0 ±  |   0.0 B/op<br>Error 0.0 ±  |
+|     Creation  |  24.0 B/op<br>Error 0.0 ±  |  24.0 B/op<br>Error 0.0 ±  |  24.0 B/op<br>Error 0.0 ±  |  72.0 B/op<br>Error 0.0 ±  |
+|  ExampleCase  |  24.0 B/op<br>Error 0.0 ±  |  24.0 B/op<br>Error 0.0 ±  |  24.0 B/op<br>Error 0.0 ±  |  72.0 B/op<br>Error 0.0 ±  |
 

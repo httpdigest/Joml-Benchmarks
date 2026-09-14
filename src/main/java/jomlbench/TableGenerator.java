@@ -37,9 +37,6 @@ public class TableGenerator {
 				builder.append("|").append(setting.buildEmpty());
 				if(setting.minRight() > 0) {
 					String[] split = element.split(setting.minimumIndicator, 2);
-					// A cell without the indicator is a single-line cell, e.g. the "N/A" written
-					// for a library that does not implement a given benchmark. Treat the second
-					// line as empty instead of failing the whole report.
 					if(split.length != 2) split = new String[] {element, ""};
 					int length = split[0].length()+2+Math.max(split[1].length(), setting.minRight());
 					int start = builder.length() - setting.getAlignOffset(length);

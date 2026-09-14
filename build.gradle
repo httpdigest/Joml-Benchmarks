@@ -68,7 +68,7 @@ jmh {
 //		'benchmark.*'
 //		'benchmark.joml.*'
 //		'benchmark.joml2_fields.*'
-//		'benchmark.joml2_records.*'
+		'benchmark.joml2_records.*'
 //		'benchmark.lidiuma_math.*'
 	]
 	humanOutputFile = null
