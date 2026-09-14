@@ -1,7 +1,6 @@
 package benchmark.joml2_fields.matrix;
 
 import java.util.random.RandomGenerator;
-import java.util.random.RandomGeneratorFactory;
 
 import static fields.org.joml2.Joml.*;
 
@@ -19,7 +18,8 @@ public class BoneAnimation {
 	FloatQuat[] rotationEnd;
 	Float3[] scaleEnd;
 	Float3x4[] inverseMatrices;
-	RandomGenerator generator;
+	/** Interpolation factors, drawn up front so the RNG stays out of the measured region. */
+	float[] factors;
 	
 	public BoneAnimation(int count, RandomGenerator generator) {
 		this.size = count;
@@ -32,6 +32,7 @@ public class BoneAnimation {
 		scaleEnd = new Float3[count];
 		
 		inverseMatrices = new Float3x4[count];
+		factors = new float[count];
 		
 		for(int i = 0;i<count;i++) {
 			translationStart[i] = float3((float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian());
@@ -44,7 +45,9 @@ public class BoneAnimation {
 			
 			inverseMatrices[i] = float3x4().composeTRS(translationStart[i], rotationStart[i], scaleStart[i]).invert();
 		}
-		this.generator = RandomGeneratorFactory.getDefault().create(generator.nextLong());
+		for(int i = 0;i<count;i++) {
+			factors[i] = generator.nextFloat();
+		}
 	}
 	
 	public Float3x4[] process() {
@@ -53,7 +56,7 @@ public class BoneAnimation {
 		FloatQuat rotation = floatQuat();
 		Float3 scale = float3();
 		for(int i = 0;i<size;i++) {
-			float t = generator.nextFloat();
+			float t = factors[i];
 			Float3x4 result = float3x4();
 			
 			translationStart[i].lerp(translationEnd[i], t, translation);

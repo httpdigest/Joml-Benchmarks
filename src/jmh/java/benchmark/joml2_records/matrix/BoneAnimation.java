@@ -1,16 +1,10 @@
 package benchmark.joml2_records.matrix;
 
 import java.util.random.RandomGenerator;
-import java.util.random.RandomGeneratorFactory;
 
 import records.org.joml2.Float3;
 import records.org.joml2.Float3x4;
 import records.org.joml2.FloatQuat;
-
-
-
-
-
 
 public class BoneAnimation {
 	int size;
@@ -22,7 +16,8 @@ public class BoneAnimation {
 	FloatQuat[] rotationEnd;
 	Float3[] scaleEnd;
 	Float3x4[] inverseMatrices;
-	RandomGenerator generator;
+	/** Interpolation factors, drawn up front so the RNG stays out of the measured region. */
+	float[] factors;
 	
 	public BoneAnimation(int count, RandomGenerator generator) {
 		this.size = count;
@@ -35,6 +30,7 @@ public class BoneAnimation {
 		scaleEnd = new Float3[count];
 		
 		inverseMatrices = new Float3x4[count];
+		factors = new float[count];
 		
 		for(int i = 0;i<count;i++) {
 			translationStart[i] = new Float3((float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian());
@@ -44,17 +40,18 @@ public class BoneAnimation {
 			translationEnd[i] = new Float3((float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian());
 			rotationEnd[i] = new FloatQuat((float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian()).normalize();
 			scaleEnd[i] = new Float3((float)generator.nextGaussian());
-			
-			
-			inverseMatrices[i] = Float3x4.composeTRS(translationStart[i], rotationStart[i], scaleStart[i]).invert().withProperties(0);
+
+			inverseMatrices[i] = Float3x4.composeTRS(translationStart[i], rotationStart[i], scaleStart[i]).invert();
 		}
-		this.generator = RandomGeneratorFactory.getDefault().create(generator.nextLong());
+		for(int i = 0;i<count;i++) {
+			factors[i] = generator.nextFloat();
+		}
 	}
 	
 	public Float3x4[] process() {
 		Float3x4[] results = new Float3x4[size];
 		for(int i = 0;i<size;i++) {
-			float t = generator.nextFloat();
+			float t = factors[i];
 			Float3 translation = translationStart[i].lerp(translationEnd[i], t);
 			FloatQuat rotation = rotationStart[i].nlerp(rotationEnd[i], t);
 			Float3 scale = scaleStart[i].lerp(scaleEnd[i], t);

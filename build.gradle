@@ -11,6 +11,16 @@ plugins {
 
 compileJava.options.encoding = "UTF-8"
 
+// Pin the compiler, so the build does not quietly follow whatever JDK happens to be
+// on PATH. Note this does NOT cover the Gradle launcher itself: Gradle's Groovy build
+// script compiler rejects class file major version 72, so the daemon JVM must also be
+// 27 or older (set org.gradle.java.home, or run with JAVA_HOME pointing at a JDK 25).
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -69,7 +79,33 @@ jmh {
     timeOnIteration = '2s'
     warmup = '3s'
     fork = 1
-    operationsPerInvocation = 5
+    // Both libraries read the same joml.fastmath property and gate the same set of
+    // functions on it (sin, cos, cosFromSin, atan2), each behind a static final flag
+    // that C2 folds away, so this stays a like-for-like comparison.
+    //
+    // sinLookup swaps the sin/cos polynomial for a table; it only takes effect when
+    // fastmath is on. Both libraries read joml.sinLookup and joml.sinLookup.bits and
+    // both default to 14 bits, so the tables are the same size and the row stays
+    // comparable; the bits property is left at that shared default.
+    //
+    // Measured error against java.lang.Math across -7..7 with these settings:
+    // sin 8.6e-7 (JOML 1) / 7.3e-7 (JOML 2), cos 5.4e-7 both, atan2 7.0e-5 both.
+    // Note the atan2 figure, because JOML 2's angleBetween is built on atan2 while
+    // JOML 1's angle uses acos, which neither library routes through fastmath. The
+    // Angle row therefore compares an approximate atan2 against an exact acos.
+    // FMA is spelled differently by the two libraries, so both names are needed:
+    // JOML 1 reads joml.useMathFma (and then ANDs it with its own Math.fma probe),
+    // JOML 2 reads joml.useFma. Setting only one silently leaves the other library
+    // on the non-FMA path.
+    jvmArgsAppend = ['-Djoml.fastmath=true', '-Djoml.sinLookup=true', '-Djoml.useMathFma=true', '-Djoml.useFma=true']
+    // Allocation per operation, reported next to the timings. Escape analysis
+    // scalar-replaces the intermediates in several of these benchmarks, so the
+    // B/op column is the only place the mutable-vs-immutable allocation
+    // difference is actually visible.
+    profilers = ['gc']
+    // NOTE: do not set operationsPerInvocation here. Every @Benchmark below
+    // performs exactly one operation per invocation; setting it to 5 silently
+    // divided every published score by 5.
     threads = 1
 }
 

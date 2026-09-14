@@ -22,15 +22,21 @@ import fields.org.joml2.Float3x4;
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 public class Matrix4x3fBenchmarks {
-	private static final float ROTATION = (float)Math.toRadians(32D);
+	private float tx, ty, tz;
+	private float angle, ax, ay, az;
+	private float qx, qy, qz, qw;
+	private float sx, sy, sz;
+	private float px, py, pz;
 	private Float3x4 matrix;
 
 	@Setup(Level.Iteration)
 	public void setupMatrix() {
-		matrix = float3x4()
-				.translate(32F, 0.5F, 1F)
-				.scale(0.25F, 2F, 1F)
-				.rotateAxis(ROTATION, 0, 1F, 0);
+		tx = 32F; ty = 0.5F; tz = 1F;
+		angle = 0.558505361F; ax = 0F; ay = 1F; az = 0F;
+		qx = 0F; qy = 0.275637356F; qz = 0F; qw = 0.961261696F;
+		sx = 0.25F; sy = 2F; sz = 1F;
+		px = 1F; py = 3F; pz = 6F;
+		matrix = float3x4().composeTRS(tx, ty, tz, qx, qy, qz, qw, sx, sy, sz);
 	}
 	
 	@Benchmark
@@ -41,22 +47,26 @@ public class Matrix4x3fBenchmarks {
 	@Benchmark
 	public Float3x4 testStandardOperation() {
 		return float3x4()
-				.translate(32F, 0.5F, 1F)
-				.scale(0.25F, 2F, 1F)
-				.rotateAxis(ROTATION, 0, 1F, 0);
+				.translate(tx, ty, tz)
+				.rotateAxis(angle, ax, ay, az)
+				.scale(sx, sy, sz);
+	}
+	
+	@Benchmark
+	public Float3x4 testComposeTRS() {
+		return float3x4().composeTRS(tx, ty, tz, qx, qy, qz, qw, sx, sy, sz);
 	}
 	
 	@Benchmark
 	public Float3 testMatrixTransform() {
-		return matrix.transformPosition(float3(1, 3, 6));
+		return matrix.transformPosition(float3(px, py, pz));
 	}
 	
 	@Benchmark
 	public Float3x4[] testBoneAnimation(AnimationContainer container) {
 		return container.animation.process();
 	}
-	
-	
+
 	@State(Scope.Benchmark)
 	public static class AnimationContainer {
 		private BoneAnimation animation;
