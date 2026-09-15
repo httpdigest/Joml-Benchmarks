@@ -45,13 +45,34 @@ public class BoneAnimation {
 			rotationEnd[i] = normalize(new QuaternionF32((float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian(), (float)generator.nextGaussian()));
 			scaleEnd[i] = multiply(oneVec3F32(), (float)generator.nextGaussian());
 			
-			inverseMatrices[i] = inverse(fromTRS(translationStart[i], rotationStart[i], scaleStart[i]));
+			inverseMatrices[i] = inverseTRS(translationStart[i], rotationStart[i], scaleStart[i]);
 		}
 		for(int i = 0;i<count;i++) {
 			factors[i] = generator.nextFloat();
 		}
 	}
 	
+	/**
+	 * The inverse of T*R*S, built as S<sup>-1</sup>*R<sup>-1</sup>*T<sup>-1</sup>.
+	 * <p>
+	 * Matrices.inverse(Affine3F32) does not return an inverse once the matrix carries a
+	 * rotation. In lidiuma-math 0.3.0-j17 the 3x3 determinant combines its cofactors as
+	 * m00 + m01 - m02 instead of m00 - m01 + m02 (math-traits 0.1.2, Affine3Ops.java:119
+	 * and Matrix3Ops.java:96), and inverse() divides an otherwise correct adjugate by it,
+	 * so M*inverse(M) comes out as (detCorrect/detBuggy)*I rather than the identity. The
+	 * two disagreeing terms are both zero for a diagonal matrix, which is why pure
+	 * translation and scale still round-trip and the bug is invisible until a rotation
+	 * shows up.
+	 * <p>
+	 * Using it here would leave this row computing something other than the near-identity
+	 * delta transform the other three libraries compute, so the inverse is composed from
+	 * primitives that do work. This runs in setup, not in the measured region, so it does
+	 * not affect the timings.
+	 */
+	private static Affine3F32 inverseTRS(Vec3F32 translation, QuaternionF32 rotation, Vec3F32 scale) {
+		return multiply(multiply(fromScale(divide(oneVec3F32(), scale)), fromRotation(invert(rotation))), fromTranslation(negated(translation)));
+	}
+
 	public Affine3F32[] process() {
 		Affine3F32[] results = new Affine3F32[size];
 		for(int i = 0;i<size;i++) {

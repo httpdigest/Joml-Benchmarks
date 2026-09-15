@@ -60,7 +60,11 @@ public class BoneAnimation {
 			Float3x4 result = float3x4();
 			
 			translationStart[i].lerp(translationEnd[i], t, translation);
-			rotationStart[i].nlerp(rotationEnd[i], t, rotation);
+			// JOML 1's nlerp is the shortest-arc variant: it negates the second quaternion
+			// when the dot product is negative. JOML 2 splits the two apart, so nlerpShortest
+			// is the equivalent; plain nlerp would take the long way round on roughly half
+			// the bones and this row would no longer compare the same rotation.
+			rotationStart[i].nlerpShortest(rotationEnd[i], t, rotation);
 			scaleStart[i].lerp(scaleEnd[i], t, scale);
 			results[i] = result.composeTRSMul(translation, rotation, scale, inverseMatrices[i]);
 		}

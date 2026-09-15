@@ -49,7 +49,7 @@ public class Matrix4x3fBenchmarks extends Matrix4x3fData {
 	
 	@Benchmark
 	public Float3 testMatrixTransform() {
-		return matrix.transformPosition(px, py, pz);
+		return matrix.transformPosition(new Float3(px, py, pz));
 	}
 	
 	@Benchmark

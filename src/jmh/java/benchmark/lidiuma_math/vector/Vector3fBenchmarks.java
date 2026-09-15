@@ -5,6 +5,7 @@ import static org.lidiuma.math.vector.Vectors.cross;
 import static org.lidiuma.math.vector.Vectors.dot;
 import static org.lidiuma.math.vector.Vectors.lengthSquared;
 import static org.lidiuma.math.vector.Vectors.normalize;
+import static org.lidiuma.math.vector.Vectors.vec3;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,13 +31,13 @@ public class Vector3fBenchmarks extends Vector3fData {
 	@Setup(Level.Iteration)
 	public void setupVectors() {
 		setupVectorData();
-		a = new Vec3F32(sx, sy, sz);
-		b = new Vec3F32(ex, ey, ez);
+		a = vec3(sx, sy, sz);
+		b = vec3(ex, ey, ez);
 	}
 	
 	@Benchmark
 	public Vec3F32 testCreation() {
-		return new Vec3F32(sx, sy, sz);
+		return vec3(sx, sy, sz);
 	}
 
 	@Benchmark
@@ -45,12 +46,22 @@ public class Vector3fBenchmarks extends Vector3fData {
 		return normalize(cross(b, c));
 	}
 
+	/**
+	 * lidiuma-math has no vector-to-vector angle function, so this one is written out
+	 * here. It mirrors JOML 1's Vector3f.angle exactly - the same float cosine, the same
+	 * clamp against precision loss pushing it outside [-1, 1], and the same exact
+	 * Math.acos - so the row measures the same algorithm rather than a second one. See
+	 * the note the report prints for this function: JOML 2's angleBetween is atan2-based
+	 * and is a third algorithm again.
+	 */
 	@Benchmark
 	public float testAngle() {
-		final double dot = dot(a, b);
-		final double length1 = lengthSquared(a);
-		final double length2 = lengthSquared(b);
-		final double theta = dot / Math.sqrt(length1 * length2);
-		return (float) Math.acos(theta);
+		final float dot = dot(a, b);
+		final float length1 = lengthSquared(a);
+		final float length2 = lengthSquared(b);
+		float cos = (float) (dot / Math.sqrt(length1 * length2));
+		cos = cos < 1F ? cos : 1F;
+		cos = cos > -1F ? cos : -1F;
+		return (float) Math.acos(cos);
 	}
 }
