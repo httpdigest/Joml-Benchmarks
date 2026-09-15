@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 public record Benchmark(String function, Map<String, Score> scores, Map<String, Score> allocations, Map<String, Metadata> metadata) {
 	public Benchmark(String function) {
@@ -20,7 +21,12 @@ public record Benchmark(String function, Map<String, Score> scores, Map<String, 
 	public List<String> generateRow(List<String> libraries, boolean allocation) {
 		List<String> result = new ArrayList<>();
 		result.add(function());
-		libraries.forEach(T -> result.add(Optional.ofNullable((allocation ? allocations() : scores()).get(T)).map(Score::toScore).orElse("N/A")));
+		// The allocation table has no error column and its own column settings, so it needs
+		// toAllocation; formatting it with toScore appended a meaningless "Error 0.0" to
+		// every cell.
+		Map<String, Score> values = allocation ? allocations() : scores();
+		Function<Score, String> formatter = allocation ? Score::toAllocation : Score::toScore;
+		libraries.forEach(T -> result.add(Optional.ofNullable(values.get(T)).map(formatter).orElse("N/A")));
 		return result;
 	}
 }

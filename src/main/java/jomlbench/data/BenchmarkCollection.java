@@ -73,19 +73,52 @@ public record BenchmarkCollection(String category, Map<String, List<Benchmark>> 
 	
 	public static List<String> findInconsistencies(Map<String, BenchmarkCollection> map) {
 		Map<Metadata, Integer> knownMetadata = map.values().stream().flatMap(BenchmarkCollection::flattenMetadata).collect(COLLECTOR);
-		if(knownMetadata.size() == 1) return List.of();
-		int largest = knownMetadata.values().stream().max(Integer::compare).orElse(1);
+		if(knownMetadata.size() <= 1) return List.of();
+		Metadata reference = findReference(knownMetadata);
 		List<String> results = new ArrayList<>();
 		for(BenchmarkCollection collection : map.values()) {
 			for(Entry<String, List<Benchmark>> clazz : collection.benchmarks().entrySet()) {
 				for(Benchmark mark : clazz.getValue()) {
 					for(Entry<String, Metadata> meta : mark.metadata().entrySet()) {
-						if(knownMetadata.get(meta.getValue()) == largest) continue;
+						if(meta.getValue().equals(reference)) continue;
 						results.add(collection.category()+" => "+clazz.getKey()+" => "+mark.function()+" => "+meta.getKey()+": "+meta.getValue().toText());
 					}
 				}
 			}
 		}
 		return results;
+	}
+	
+	/**
+	 * Every distinct set of conditions the rows were measured under, largest group first.
+	 */
+	public static List<Metadata> distinctMetadata(Map<String, BenchmarkCollection> map) {
+		Map<Metadata, Integer> knownMetadata = map.values().stream().flatMap(BenchmarkCollection::flattenMetadata).collect(COLLECTOR);
+		return knownMetadata.entrySet().stream().sorted(Entry.<Metadata, Integer>comparingByValue().reversed()).map(Entry::getKey).toList();
+	}
+	
+	/**
+	 * The conditions the majority of the rows were measured under, or null when no single
+	 * group is larger than every other one.
+	 * <p>
+	 * The null matters: comparing each row against "the largest count" instead of against a
+	 * specific group meant that when two groups tied for largest, every row counted as the
+	 * majority, nothing was reported, and the empty list was printed as "Consistent Data:
+	 * Yes" - precisely the half-old-half-new run the check exists to catch.
+	 */
+	private static Metadata findReference(Map<Metadata, Integer> counts) {
+		Metadata reference = null;
+		int largest = 0;
+		boolean tied = false;
+		for(Entry<Metadata, Integer> entry : counts.entrySet()) {
+			int count = entry.getValue();
+			if(count > largest) {
+				largest = count;
+				reference = entry.getKey();
+				tied = false;
+			}
+			else if(count == largest) tied = true;
+		}
+		return tied ? null : reference;
 	}
 }

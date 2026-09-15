@@ -16,7 +16,7 @@ public record Score(double score, double error, String unit) {
 	}
 	
 	public String toScore() {
-		return FORMAT.format(score())+" "+unit()+"<br>Error "+FORMAT.format(error())+" ±";
+		return FORMAT.format(score())+" "+unit()+"<br>Error ± "+FORMAT.format(error());
 	}
 	
 	public String toAllocation() {

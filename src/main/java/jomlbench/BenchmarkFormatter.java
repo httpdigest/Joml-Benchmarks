@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -34,6 +35,18 @@ public class BenchmarkFormatter {
 			"joml2_fields", "JOML2_VERSION",
 			"joml2_records", "JOML2_VERSION",
 			"lidiuma_math", "LIDIUMA_MATH_VERSION");
+	private static final Map<String, String> LIBRARY_NOTES = Map.of(
+			"lidiuma_math", "components are boxed - Vec3F32, QuaternionF32 and Affine3F32 are records of java.lang.Float - so its rows include boxing and wrapper construction rather than float math alone.");
+	/**
+	 * Footnotes for rows that are not a like-for-like comparison, keyed by class name or by
+	 * "ClassName.FunctionName". A gap or a mismatched algorithm that only lives in a source
+	 * comment is invisible to whoever reads the published table, so it belongs here.
+	 */
+	private static final Map<String, String> NOTES = Map.of(
+			"Vector3fBenchmarks.Angle", "**Angle** does not compare one algorithm. JOML and Lidiuma Math both take the acos of the clamped cosine with an exact `java.lang.Math.acos`, which neither library routes through fastmath; JOML2's `angleBetween` is built on atan2, which fastmath *does* approximate (error against `java.lang.Math` around 7e-5). JOML2 has no `angleCos`, so the row cannot be made like-for-like and the JOML2 figures are not a straight speedup. Lidiuma Math has no vector-to-vector angle function at all, so its column runs code written in the benchmark that mirrors JOML's algorithm.",
+			"Matrix4x3fBenchmarks.BoneAnimation", "**BoneAnimation** transforms `operationMultiplier` (100) bones per invocation, and the score and allocation are divided by that. This row is therefore per bone, while every other row in the table is per call.",
+			"Matrix4x3fBenchmarks.StandardOperation", "**StandardOperation** is N/A for Lidiuma Math because it has no incremental transform API. Composing it from `fromTranslation`/`fromRotation`/`fromScale` and two multiplies would put three matrix constructions and two full multiplies against JOML's fused in-place update - a different algorithm rather than a slower one.",
+			"Matrix4fBenchmarks", "Lidiuma Math has no column here: its `Matrix4F32` offers no TRS composition and no position transform (only `multiply(Matrix4F32, Vec4F32)`), so these four functions cannot be written with library calls.");
 
 	public static void main(String[] args) {
 		processBenchmarks(args);
@@ -65,6 +78,10 @@ public class BenchmarkFormatter {
 			else {
 				builder.append("- Consistent Data: No. These were not measured under the same conditions as the rest, so the tables below mix runs:\n");
 				validation.forEach(T -> builder.append("\t- ").append(T).append("\n"));
+				// Without this the report loses its system information entirely in exactly the
+				// case where knowing which machine produced which row matters most.
+				builder.append("- Conditions present, largest group first:\n");
+				BenchmarkCollection.distinctMetadata(results).forEach(T -> builder.append("\t- ").append(T.toText()).append("\n"));
 			}
 			builder.append("\n\n");
 			builder.append("## Libraries Tested").append("\n");
@@ -81,6 +98,7 @@ public class BenchmarkFormatter {
 					if(!allocation.isEmpty()) {
 						builder.append("Allocation per operation:\n\n").append(allocation).append("\n");
 					}
+					appendNotes(builder, clazz.getKey(), clazz.getValue());
 				}
 			}
 			System.out.println("Writing Output");
@@ -120,6 +138,17 @@ public class BenchmarkFormatter {
 		return result;
 	}
 	
+	private static void appendNotes(StringBuilder builder, String clazz, List<Benchmark> benchmarks) {
+		List<String> notes = new ArrayList<>();
+		// generateTable has already sorted the list, so the footnotes come out in table order.
+		Optional.ofNullable(NOTES.get(clazz)).ifPresent(notes::add);
+		benchmarks.stream().map(T -> NOTES.get(clazz+"."+T.function())).filter(Objects::nonNull).forEach(notes::add);
+		if(notes.isEmpty()) return;
+		builder.append("Notes:\n\n");
+		notes.forEach(T -> builder.append("- ").append(T).append("\n"));
+		builder.append("\n");
+	}
+	
 	private static void appendLibraries(StringBuilder builder, Map<String, BenchmarkCollection> results) {
 		Map<String, String> properties = readProperties(Path.of("gradle.properties"));
 		Set<String> libraries = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -128,6 +157,7 @@ public class BenchmarkFormatter {
 			String name = LIBRARY_NAMES.getOrDefault(library, TextUtil.toPascalCase(library, " "));
 			String version = properties.getOrDefault(LIBRARY_VERSIONS.getOrDefault(library, ""), "unknown");
 			builder.append("- ").append(name).append(": ").append(version).append("\n");
+			Optional.ofNullable(LIBRARY_NOTES.get(library)).ifPresent(T -> builder.append("\t- ").append(T).append("\n"));
 		}
 	}
 	

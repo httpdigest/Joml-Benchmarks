@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
  * equality drives findInconsistencies, so adding a field here automatically makes
  * a mismatch in it show up as "Consistent Data: No" rather than passing silently.
  */
-public record Metadata(String version, String jdk, String vm, String vmVersion, int threads, int forks, int warmup, String warupTime, int iterations, String iterationTime, String os, String cpu, String libraryOptions) {
+public record Metadata(String version, String jdk, String vm, String vmVersion, int threads, int forks, int warmup, String warmupTime, int iterations, String iterationTime, String os, String cpu, String libraryOptions) {
 	public Metadata(JsonObject obj) {
 		this(
 			jsonString(obj, "jmhVersion", "unrecorded"), 
@@ -41,14 +41,14 @@ public record Metadata(String version, String jdk, String vm, String vmVersion, 
 		joiner.add("Threads="+threads()+"\n");
 		joiner.add("Forks="+forks()+"\n");
 		joiner.add("Warmup Iterations="+warmup()+"\n");
-		joiner.add("Warmup Time="+warupTime()+"\n");
-		joiner.add("Iteratations="+iterations()+"\n");
+		joiner.add("Warmup Time="+warmupTime()+"\n");
+		joiner.add("Iterations="+iterations()+"\n");
 		joiner.add("Iteration Time="+iterationTime());
 		return joiner.toString();
 	}
 	
 	public String toText() {
-		return "[os="+os()+", cpu="+cpu()+", jdk="+jdk()+", vm="+vmVersion()+", opts="+libraryOptions()+", jmh="+version()+", threads="+threads()+", forks="+forks()+", warmCount="+warmup()+", warmTime="+warupTime()+", count="+iterations()+", time="+iterationTime()+"]";
+		return "[os="+os()+", cpu="+cpu()+", jdk="+jdk()+", vm="+vmVersion()+", opts="+libraryOptions()+", jmh="+version()+", threads="+threads()+", forks="+forks()+", warmCount="+warmup()+", warmTime="+warmupTime()+", count="+iterations()+", time="+iterationTime()+"]";
 	}
 	
 	static String jsonEnvironment(JsonObject obj, String key) {
